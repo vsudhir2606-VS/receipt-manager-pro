@@ -1,9 +1,17 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Receipt, ReceiptStatus, FinancialSummary } from './types.ts';
-import Dashboard from './components/Dashboard.tsx';
-import ReceiptTable from './components/ReceiptTable.tsx';
-import ReceiptForm from './components/ReceiptForm.tsx';
+import { Receipt, ReceiptStatus, FinancialSummary } from './types';
+import Dashboard from './components/Dashboard';
+import ReceiptTable from './components/ReceiptTable';
+import ReceiptForm from './components/ReceiptForm';
+
+// Fallback for random ID generation if crypto.randomUUID is not available (e.g., non-HTTPS)
+const generateId = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+};
 
 const App: React.FC = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -27,13 +35,7 @@ const App: React.FC = () => {
     localStorage.setItem('rupee_receipts', JSON.stringify(receipts));
   }, [receipts]);
 
-  const generateReceiptNo = (count: number): string => {
-    const nextNum = count + 1;
-    return `AB_RNC - ${nextNum.toString().padStart(2, '0')}`;
-  };
-
-  const nextReceiptNo = useMemo(() => {
-    // We base it on the highest receipt number found or just length if none
+  const nextReceiptNoSuggestion = useMemo(() => {
     if (receipts.length === 0) return "AB_RNC - 01";
     
     const nums = receipts.map(r => {
@@ -67,14 +69,13 @@ const App: React.FC = () => {
     );
   }, [receipts]);
 
-  const handleAddReceipt = (data: Omit<Receipt, 'id' | 'receiptNo' | 'amount' | 'totalAmount'>) => {
+  const handleAddReceipt = (data: Omit<Receipt, 'id' | 'amount' | 'totalAmount'>) => {
     const amount = data.quantity * data.price;
     const totalAmount = amount - data.discount;
     
     const newReceipt: Receipt = {
       ...data,
-      id: crypto.randomUUID(),
-      receiptNo: nextReceiptNo,
+      id: generateId(),
       amount,
       totalAmount
     };
@@ -109,7 +110,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-12">
-      {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
@@ -135,7 +135,6 @@ const App: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Dashboard Section */}
         <section>
           <div className="flex items-center gap-2 mb-4">
             <i className="fa-solid fa-chart-pie text-indigo-600"></i>
@@ -144,7 +143,6 @@ const App: React.FC = () => {
           <Dashboard summary={financialSummary} />
         </section>
 
-        {/* Data Table Section */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
@@ -165,14 +163,13 @@ const App: React.FC = () => {
         </section>
       </main>
 
-      {/* Form Modal */}
       {isFormOpen && (
         <ReceiptForm 
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}
           onSubmit={editingReceipt ? handleUpdateReceipt : handleAddReceipt}
           initialData={editingReceipt || undefined}
-          nextReceiptNo={editingReceipt ? editingReceipt.receiptNo : nextReceiptNo}
+          nextReceiptNo={nextReceiptNoSuggestion}
         />
       )}
     </div>

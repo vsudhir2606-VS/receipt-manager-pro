@@ -13,6 +13,7 @@ interface ReceiptFormProps {
 const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, initialData, nextReceiptNo }) => {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
+    receiptNo: '',
     name: '',
     itemDescription: '',
     customerRequest: '',
@@ -26,6 +27,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
     if (initialData) {
       setFormData({
         date: initialData.date,
+        receiptNo: initialData.receiptNo,
         name: initialData.name,
         itemDescription: initialData.itemDescription,
         customerRequest: initialData.customerRequest,
@@ -34,8 +36,11 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
         discount: initialData.discount,
         status: initialData.status
       });
+    } else {
+      // Suggest the next number but allow manual overwrite
+      setFormData(prev => ({ ...prev, receiptNo: nextReceiptNo }));
     }
-  }, [initialData]);
+  }, [initialData, nextReceiptNo]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,8 +63,8 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
             <h2 className="text-xl font-bold text-slate-900">
               {initialData ? 'Edit Record' : 'New Transaction'}
             </h2>
-            <p className="text-sm text-slate-500 font-medium">
-              Receipt No: <span className="text-indigo-600">{nextReceiptNo}</span>
+            <p className="text-xs text-slate-500 font-medium">
+              Update details manually below
             </p>
           </div>
           <button 
@@ -85,6 +90,19 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
             <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Receipt No.</label>
+              <input
+                required
+                type="text"
+                placeholder="e.g. AB_RNC - 01"
+                value={formData.receiptNo}
+                onChange={(e) => setFormData({ ...formData, receiptNo: e.target.value })}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all font-mono font-bold text-indigo-600"
+              />
+            </div>
+
+            {/* Row 2 */}
+            <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Customer Name</label>
               <input
                 required
@@ -96,7 +114,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 2 - Full Width */}
+            {/* Row 3 - Full Width */}
             <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Item Description</label>
               <textarea
@@ -109,7 +127,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 3 - Full Width */}
+            {/* Row 4 - Full Width */}
             <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Customer Request (Optional)</label>
               <input
@@ -121,7 +139,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 4 - Calculations */}
+            {/* Row 5 - Calculations */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Quantity</label>
               <input
