@@ -3,6 +3,7 @@ export enum ReceiptStatus {
   WORK_IN_PROGRESS = 'Work in Progress',
   PENDING = 'Pending',
   PAID = 'Paid',
+  COMPLETED = 'Completed',
   CANCELLED = 'Cancelled'
 }
 

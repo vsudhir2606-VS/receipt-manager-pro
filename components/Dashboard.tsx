@@ -123,6 +123,7 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
                   for(let i=0; i<idx; i++) offset += ((statusCounts[statuses[i]] || 0) / totalCount) * 100;
                   const colors: any = { 
                     [ReceiptStatus.PAID]: '#10b981', 
+                    [ReceiptStatus.COMPLETED]: '#14b8a6',
                     [ReceiptStatus.PENDING]: '#f59e0b', 
                     [ReceiptStatus.CANCELLED]: '#f43f5e', 
                     [ReceiptStatus.WORK_IN_PROGRESS]: '#3b82f6' 
@@ -136,7 +137,7 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
              </div>
           </div>
           <div className="grid grid-cols-2 gap-2 w-full">
-            {statuses.map(s => <div key={s} className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase"><div className={`w-1.5 h-1.5 rounded-full ${s === ReceiptStatus.PAID ? 'bg-emerald-500' : s === ReceiptStatus.PENDING ? 'bg-amber-500' : s === ReceiptStatus.CANCELLED ? 'bg-rose-500' : 'bg-blue-500'}`}></div>{s}</div>)}
+            {statuses.map(s => <div key={s} className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase"><div className={`w-1.5 h-1.5 rounded-full ${s === ReceiptStatus.PAID ? 'bg-emerald-500' : s === ReceiptStatus.COMPLETED ? 'bg-teal-500' : s === ReceiptStatus.PENDING ? 'bg-amber-500' : s === ReceiptStatus.CANCELLED ? 'bg-rose-500' : 'bg-blue-500'}`}></div>{s}</div>)}
           </div>
         </div>
       </div>
