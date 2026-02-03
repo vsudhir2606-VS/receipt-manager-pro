@@ -21,7 +21,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, receipts
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `RUPEE_RECEIPTS_BACKUP_${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `RECEIPT_MANAGER_PRO_BACKUP_${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -41,7 +41,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, receipts
             onClose();
           }
         } else {
-          alert("Error: The selected file does not contain a valid RupeeReceipts ledger array.");
+          alert("Error: The selected file does not contain a valid Receipt Manager Pro ledger array.");
         }
       } catch (err) {
         alert("Error: Failed to parse the backup file. Please ensure it is a valid .json file.");
@@ -136,7 +136,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, receipts
 
         <div className="p-6 bg-slate-50 text-center">
            <p className="text-[9px] text-slate-400 font-medium leading-relaxed">
-             RupeeReceipts stores data locally in your browser. <br/>
+             Receipt Manager Pro stores data locally in your browser. <br/>
              To share your database with other people, download the backup <br/>
              and send it to them for importing.
            </p>

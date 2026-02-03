@@ -28,7 +28,7 @@ const App: React.FC = () => {
 
   // Load from permanent local storage
   useEffect(() => {
-    const saved = localStorage.getItem('rupee_receipts_v3');
+    const saved = localStorage.getItem('receipt_manager_pro_v3');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -41,7 +41,7 @@ const App: React.FC = () => {
 
   // Auto-save to permanent local storage
   useEffect(() => {
-    localStorage.setItem('rupee_receipts_v3', JSON.stringify(receipts));
+    localStorage.setItem('receipt_manager_pro_v3', JSON.stringify(receipts));
   }, [receipts]);
 
   const nextReceiptNoSuggestion = useMemo(() => {
@@ -95,14 +95,14 @@ const App: React.FC = () => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Receipts");
-    XLSX.writeFile(workbook, `Ledger_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(workbook, `ReceiptManagerPro_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const handleExportPDF = () => {
     if (receipts.length === 0) return alert("No data to export!");
     const doc = new jspdf.jsPDF('landscape');
     doc.setFontSize(18);
-    doc.text("RupeeReceipts - Ledger Report", 14, 20);
+    doc.text("Receipt Manager Pro - Ledger Report", 14, 20);
     const tableData = receipts.map(r => [
       r.date, r.receiptNo, r.name, r.itemDescription, r.quantity, 
       `Rs. ${r.price}`, `Rs. ${r.discount}`, r.status, `Rs. ${r.totalAmount}`
@@ -115,7 +115,7 @@ const App: React.FC = () => {
       styles: { fontSize: 8 },
       headStyles: { fillColor: [79, 70, 229] }
     });
-    doc.save(`Ledger_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`ReceiptManagerPro_Report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const handleAddReceipt = (data: Omit<Receipt, 'id' | 'amount' | 'totalAmount'>) => {
@@ -150,7 +150,7 @@ const App: React.FC = () => {
               <i className="fa-solid fa-indian-rupee-sign text-2xl"></i>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">RupeeReceipts</h1>
+              <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">Receipt Manager Pro</h1>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.1em]">Persistence Active</p>
