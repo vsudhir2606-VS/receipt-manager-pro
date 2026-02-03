@@ -23,24 +23,16 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
       .forEach(r => {
         dailyData[r.date] = (dailyData[r.date] || 0) + r.totalAmount;
       });
+    // Return last 7 active days
     return Object.entries(dailyData)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .slice(-7);
   }, [receipts]);
 
-  const topItems = useMemo(() => {
-    const itemMap: Record<string, { revenue: number, qty: number }> = {};
-    receipts.forEach(r => {
-      if (r.status === ReceiptStatus.CANCELLED) return;
-      const desc = r.itemDescription.trim();
-      if (!itemMap[desc]) itemMap[desc] = { revenue: 0, qty: 0 };
-      itemMap[desc].revenue += r.totalAmount;
-      itemMap[desc].qty += r.quantity;
-    });
-    return Object.entries(itemMap)
-      .sort((a, b) => b[1].revenue - a[1].revenue)
-      .slice(0, 3);
-  }, [receipts]);
+  const maxRevenue = useMemo(() => {
+    const vals = trendData.map(td => td[1]);
+    return vals.length > 0 ? Math.max(...vals) : 1;
+  }, [trendData]);
 
   const cards = [
     { title: 'Gross Revenue', value: `₹${summary.totalRevenue.toLocaleString('en-IN')}`, icon: 'fa-solid fa-vault', color: 'from-emerald-500 to-teal-600', count: summary.activeReceiptCount },
@@ -72,15 +64,60 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-          <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Revenue Momentum</h3>
-          <div className="h-48 w-full relative">
-            {trendData.length > 1 ? (
-              <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-                <polyline fill="none" stroke="#4f46e5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" points={trendData.map((d, i) => `${(i / (trendData.length - 1)) * 100},${100 - (d[1] / Math.max(...trendData.map(td => td[1])) * 100)}`).join(' ')} />
-                <path className="fill-indigo-50/50" d={`M0,100 ${trendData.map((d, i) => `${(i / (trendData.length - 1)) * 100},${100 - (d[1] / Math.max(...trendData.map(td => td[1])) * 100)}`).join(' ')} L100,100 Z`} />
-              </svg>
-            ) : <div className="h-full flex items-center justify-center text-slate-300 font-bold uppercase text-xs">Awaiting Data Trend...</div>}
+        {/* Statistics Bar Graph */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col">
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Revenue Statistics</h3>
+              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Daily Breakdown (Last 7 Active Days)</p>
+            </div>
+            <div className="flex items-center gap-2">
+               <span className="w-3 h-3 bg-indigo-500 rounded-sm"></span>
+               <span className="text-[10px] font-black text-slate-500 uppercase">Revenue (₹)</span>
+            </div>
+          </div>
+          
+          <div className="flex-1 flex items-end justify-between gap-4 h-48 px-2 relative">
+            {/* Horizontal Grid Lines */}
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+              <div className="border-t border-slate-50 w-full"></div>
+              <div className="border-t border-slate-50 w-full"></div>
+              <div className="border-t border-slate-50 w-full"></div>
+              <div className="border-t border-slate-100 w-full"></div>
+            </div>
+
+            {trendData.length > 0 ? trendData.map(([date, revenue], i) => {
+              const heightPercentage = (revenue / maxRevenue) * 100;
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end">
+                  {/* Tooltip on hover */}
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                    ₹{revenue.toLocaleString('en-IN')}
+                  </div>
+                  
+                  {/* The Bar */}
+                  <div 
+                    className="w-full max-w-[40px] bg-indigo-500 rounded-t-lg group-hover:bg-indigo-600 transition-all duration-300 relative"
+                    style={{ height: `${Math.max(heightPercentage, 2)}%` }}
+                  >
+                    {/* Bar Highlight Effect */}
+                    <div className="absolute inset-x-0 top-0 h-1/2 bg-white/10 rounded-t-lg"></div>
+                  </div>
+                  
+                  {/* Date Label */}
+                  <div className="mt-3 text-[9px] font-black text-slate-400 uppercase transform -rotate-45 sm:rotate-0 origin-center whitespace-nowrap">
+                    {new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                  </div>
+                </div>
+              );
+            }) : (
+              <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-slate-100 rounded-xl">
+                 <div className="text-center">
+                    <i className="fa-solid fa-chart-simple text-slate-200 text-3xl mb-3"></i>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Transaction Data Found</p>
+                 </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -94,11 +131,12 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
                   let offset = 0;
                   for(let i=0; i<idx; i++) offset += ((statusCounts[statuses[i]] || 0) / totalCount) * 100;
                   const colors: any = { [ReceiptStatus.PAID]: '#10b981', [ReceiptStatus.PENDING]: '#f59e0b', [ReceiptStatus.CANCELLED]: '#f43f5e', [ReceiptStatus.PARTIAL]: '#3b82f6' };
-                  return <circle key={status} cx="18" cy="18" r="15.9" fill="none" stroke={colors[status]} strokeWidth="3" strokeDasharray={`${percent} ${100 - percent}`} strokeDashoffset={-offset} />;
+                  return <circle key={status} cx="18" cy="18" r="15.9" fill="none" stroke={colors[status]} strokeWidth="3" strokeDasharray={`${percent} ${100 - percent}`} strokeDashoffset={-offset} strokeLinecap="round" />;
                })}
              </svg>
              <div className="absolute inset-0 flex items-center justify-center flex-col">
                 <span className="text-xl font-black text-slate-900 leading-none">{receipts.length}</span>
+                <span className="text-[8px] font-bold text-slate-400 uppercase mt-1">Total Items</span>
              </div>
           </div>
           <div className="grid grid-cols-2 gap-2 w-full">

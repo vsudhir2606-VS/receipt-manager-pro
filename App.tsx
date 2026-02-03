@@ -144,7 +144,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
+        <div className="max-w-[100vw] mx-auto px-4 sm:px-6 lg:px-10 flex items-center justify-between h-20">
           <div className="flex items-center gap-4">
             <div className="bg-indigo-600 p-2.5 rounded-xl text-white shadow-lg shadow-indigo-100">
               <i className="fa-solid fa-indian-rupee-sign text-2xl"></i>
@@ -193,9 +193,9 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-none mx-auto w-full px-4 sm:px-6 lg:px-10 py-8">
         {view === 'dashboard' ? (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">Home Dashboard</h2>
@@ -209,7 +209,7 @@ const App: React.FC = () => {
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">Transactional Ledger</h2>
-                <p className="text-slate-500 font-medium">The source of truth for all entries. Click the <i className="fa-solid fa-gear"></i> for data sync.</p>
+                <p className="text-slate-500 font-medium">Full view of all business transactions. Click <i className="fa-solid fa-gear"></i> for data sync.</p>
               </div>
               
               <div className="flex flex-wrap items-center gap-3">
@@ -224,7 +224,7 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden min-h-[500px]">
+            <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200 overflow-hidden min-h-[600px] w-full">
               <ReceiptTable receipts={receipts} onEdit={(r) => { setEditingReceipt(r); setIsFormOpen(true); }} onDelete={handleDeleteReceipt} />
             </div>
           </div>
