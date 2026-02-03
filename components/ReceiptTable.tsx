@@ -48,8 +48,10 @@ const ReceiptTable: React.FC<ReceiptTableProps> = ({ receipts, onEdit, onDelete 
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Price</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Amount</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right text-rose-400">Discount</th>
+            <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right text-emerald-500">Advance</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-center">Status</th>
-            <th className="px-5 py-6 font-black text-slate-900 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Total Amount</th>
+            <th className="px-5 py-6 font-black text-slate-900 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Total Bill</th>
+            <th className="px-5 py-6 font-black text-slate-900 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right text-amber-600">Pending</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-center">Actions</th>
           </tr>
         </thead>
@@ -67,12 +69,14 @@ const ReceiptTable: React.FC<ReceiptTableProps> = ({ receipts, onEdit, onDelete 
               <td className="px-5 py-5 whitespace-nowrap text-right font-bold tabular-nums text-slate-600">₹{receipt.price.toLocaleString('en-IN')}</td>
               <td className="px-5 py-5 whitespace-nowrap text-right font-bold tabular-nums text-slate-400">₹{(receipt.quantity * receipt.price).toLocaleString('en-IN')}</td>
               <td className="px-5 py-5 whitespace-nowrap text-right text-rose-500 font-black tabular-nums">-₹{receipt.discount.toLocaleString('en-IN')}</td>
+              <td className="px-5 py-5 whitespace-nowrap text-right text-emerald-600 font-black tabular-nums">₹{receipt.advance.toLocaleString('en-IN')}</td>
               <td className="px-5 py-5 whitespace-nowrap text-center">
                 <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase border shadow-sm ${getStatusStyle(receipt.status)}`}>
                   {receipt.status}
                 </span>
               </td>
-              <td className="px-5 py-5 whitespace-nowrap text-right font-black text-slate-900 tabular-nums text-lg">₹{receipt.totalAmount.toLocaleString('en-IN')}</td>
+              <td className="px-5 py-5 whitespace-nowrap text-right font-black text-slate-900 tabular-nums">₹{receipt.totalAmount.toLocaleString('en-IN')}</td>
+              <td className="px-5 py-5 whitespace-nowrap text-right font-black text-amber-600 tabular-nums text-lg">₹{(receipt.balance).toLocaleString('en-IN')}</td>
               <td className="px-5 py-5 whitespace-nowrap text-center">
                 <div className="flex items-center justify-center gap-2 opacity-30 group-hover:opacity-100 transition-opacity">
                   <button 

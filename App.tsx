@@ -88,8 +88,10 @@ const App: React.FC = () => {
       "Qty": r.quantity,
       "Price (₹)": r.price,
       "Discount (₹)": r.discount,
+      "Advance (₹)": r.advance,
       "Amount (₹)": r.amount,
-      "Total Amount (₹)": r.totalAmount,
+      "Final Total (₹)": r.totalAmount,
+      "Pending Balance (₹)": r.balance,
       "Status": r.status
     }));
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -105,10 +107,10 @@ const App: React.FC = () => {
     doc.text("Receipt Manager Pro - Ledger Report", 14, 20);
     const tableData = receipts.map(r => [
       r.date, r.receiptNo, r.name, r.itemDescription, r.quantity, 
-      `Rs. ${r.price}`, `Rs. ${r.discount}`, r.status, `Rs. ${r.totalAmount}`
+      `₹${r.price}`, `₹${r.discount}`, `₹${r.advance}`, r.status, `₹${r.balance}`
     ]);
     (doc as any).autoTable({
-      head: [['Date', 'No.', 'Name', 'Description', 'Qty', 'Price', 'Discount', 'Status', 'Total']],
+      head: [['Date', 'No.', 'Name', 'Description', 'Qty', 'Price', 'Discount', 'Advance', 'Status', 'Balance']],
       body: tableData,
       startY: 30,
       theme: 'grid',
@@ -118,10 +120,11 @@ const App: React.FC = () => {
     doc.save(`ReceiptManagerPro_Report_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  const handleAddReceipt = (data: Omit<Receipt, 'id' | 'amount' | 'totalAmount'>) => {
+  const handleAddReceipt = (data: Omit<Receipt, 'id' | 'amount' | 'totalAmount' | 'balance'>) => {
     const amount = data.quantity * data.price;
     const totalAmount = amount - data.discount;
-    const newReceipt: Receipt = { ...data, id: generateId(), amount, totalAmount };
+    const balance = totalAmount - data.advance;
+    const newReceipt: Receipt = { ...data, id: generateId(), amount, totalAmount, balance };
     setReceipts([...receipts, newReceipt]);
     setIsFormOpen(false);
   };
@@ -129,7 +132,8 @@ const App: React.FC = () => {
   const handleUpdateReceipt = (data: Receipt) => {
     const amount = data.quantity * data.price;
     const totalAmount = amount - data.discount;
-    const updated = receipts.map(r => r.id === data.id ? { ...data, amount, totalAmount } : r);
+    const balance = totalAmount - data.advance;
+    const updated = receipts.map(r => r.id === data.id ? { ...data, amount, totalAmount, balance } : r);
     setReceipts(updated);
     setEditingReceipt(null);
     setIsFormOpen(false);

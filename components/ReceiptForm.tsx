@@ -20,6 +20,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
     quantity: 1,
     price: '' as string | number, // Blank by default
     discount: '' as string | number, // Blank by default
+    advance: '' as string | number, // Blank by default
     status: ReceiptStatus.PENDING
   });
 
@@ -34,6 +35,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
         quantity: initialData.quantity,
         price: initialData.price,
         discount: initialData.discount,
+        advance: initialData.advance,
         status: initialData.status
       });
     } else {
@@ -41,7 +43,8 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
         ...prev, 
         receiptNo: nextReceiptNo,
         price: '',
-        discount: ''
+        discount: '',
+        advance: ''
       }));
     }
   }, [initialData, nextReceiptNo]);
@@ -54,15 +57,19 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
 
   const numPrice = getNumValue(formData.price);
   const numDiscount = getNumValue(formData.discount);
-  const amount = formData.quantity * numPrice;
-  const totalAmount = amount - numDiscount;
+  const numAdvance = getNumValue(formData.advance);
+  
+  const subtotal = formData.quantity * numPrice;
+  const finalTotal = subtotal - numDiscount;
+  const pendingBalance = finalTotal - numAdvance;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const submissionData = {
       ...formData,
       price: numPrice,
-      discount: numDiscount
+      discount: numDiscount,
+      advance: numAdvance
     };
     if (initialData) {
       onSubmit({ ...initialData, ...submissionData });
@@ -195,6 +202,22 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
             </div>
 
             <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Advance Paid (₹)</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold">₹</span>
+                <input
+                  min="0"
+                  type="number"
+                  step="any"
+                  value={formData.advance}
+                  onChange={(e) => setFormData({ ...formData, advance: e.target.value })}
+                  className="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                  placeholder="Advance Paid"
+                />
+              </div>
+            </div>
+
+            <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Status</label>
               <select
                 value={formData.status}
@@ -211,16 +234,26 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
           <div className="mt-8 p-5 bg-indigo-50 rounded-xl border border-indigo-100 flex flex-col gap-3">
              <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600 font-medium">Subtotal (Qty x Price)</span>
-                <span className="font-bold text-slate-900">₹{amount.toLocaleString('en-IN')}</span>
+                <span className="font-bold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
              </div>
              <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600 font-medium">Applied Discount</span>
                 <span className="font-bold text-rose-500">-₹{numDiscount.toLocaleString('en-IN')}</span>
              </div>
+             <div className="flex justify-between items-center text-sm">
+                <span className="text-slate-600 font-medium">Final Bill Amount</span>
+                <span className="font-bold text-slate-900 underline decoration-indigo-200 decoration-2 underline-offset-4">₹{finalTotal.toLocaleString('en-IN')}</span>
+             </div>
+             <div className="flex justify-between items-center text-sm">
+                <span className="text-emerald-700 font-bold">Advance Received</span>
+                <span className="font-bold text-emerald-600">₹{numAdvance.toLocaleString('en-IN')}</span>
+             </div>
              <div className="h-px bg-indigo-200 my-1"></div>
              <div className="flex justify-between items-center">
-                <span className="text-indigo-900 font-bold text-lg">Total Amount</span>
-                <span className="text-indigo-600 font-black text-2xl tracking-tight">₹{totalAmount.toLocaleString('en-IN')}</span>
+                <span className="text-indigo-900 font-bold text-lg">Pending Balance</span>
+                <span className={`font-black text-2xl tracking-tight ${pendingBalance > 0 ? 'text-amber-600' : 'text-indigo-600'}`}>
+                  ₹{pendingBalance.toLocaleString('en-IN')}
+                </span>
              </div>
           </div>
 

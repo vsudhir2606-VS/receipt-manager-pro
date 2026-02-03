@@ -17,8 +17,10 @@ export interface Receipt {
   quantity: number;
   price: number;
   discount: number;
+  advance: number;
   amount: number; // Qty * Price
   totalAmount: number; // Amount - Discount
+  balance: number; // Total Amount - Advance
   status: ReceiptStatus;
 }
 
