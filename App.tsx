@@ -1,11 +1,10 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Receipt, ReceiptStatus, FinancialSummary } from './types';
-import Dashboard from './components/Dashboard';
-import ReceiptTable from './components/ReceiptTable';
-import ReceiptForm from './components/ReceiptForm';
+import { Receipt, ReceiptStatus, FinancialSummary } from './types.ts';
+import Dashboard from './components/Dashboard.tsx';
+import ReceiptTable from './components/ReceiptTable.tsx';
+import ReceiptForm from './components/ReceiptForm.tsx';
 
-// Fallback for random ID generation if crypto.randomUUID is not available (e.g., non-HTTPS)
 const generateId = () => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
@@ -18,9 +17,8 @@ const App: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingReceipt, setEditingReceipt] = useState<Receipt | null>(null);
 
-  // Load from local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('rupee_receipts');
+    const saved = localStorage.getItem('rupee_receipts_v2');
     if (saved) {
       try {
         setReceipts(JSON.parse(saved));
@@ -30,14 +28,12 @@ const App: React.FC = () => {
     }
   }, []);
 
-  // Save to local storage on change
   useEffect(() => {
-    localStorage.setItem('rupee_receipts', JSON.stringify(receipts));
+    localStorage.setItem('rupee_receipts_v2', JSON.stringify(receipts));
   }, [receipts]);
 
   const nextReceiptNoSuggestion = useMemo(() => {
     if (receipts.length === 0) return "AB_RNC - 01";
-    
     const nums = receipts.map(r => {
       const parts = r.receiptNo.split(' - ');
       return parts.length > 1 ? parseInt(parts[1], 10) : 0;
@@ -109,7 +105,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-12">
+    <div className="min-h-screen pb-12 bg-slate-50">
       <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
@@ -118,7 +114,7 @@ const App: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900 leading-tight">RupeeReceipts</h1>
-              <p className="text-sm text-slate-500">Financial Management Tool</p>
+              <p className="text-sm text-slate-500 font-medium">Manual Entry Portal</p>
             </div>
           </div>
           <button
@@ -126,10 +122,10 @@ const App: React.FC = () => {
               setEditingReceipt(null);
               setIsFormOpen(true);
             }}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all shadow-sm active:scale-95"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-bold transition-all shadow-sm active:scale-95"
           >
             <i className="fa-solid fa-plus"></i>
-            New Receipt
+            Add New Entry
           </button>
         </div>
       </header>
@@ -138,7 +134,7 @@ const App: React.FC = () => {
         <section>
           <div className="flex items-center gap-2 mb-4">
             <i className="fa-solid fa-chart-pie text-indigo-600"></i>
-            <h2 className="text-lg font-semibold text-slate-800">Financial Summary</h2>
+            <h2 className="text-lg font-bold text-slate-800">Financial Insights</h2>
           </div>
           <Dashboard summary={financialSummary} />
         </section>
@@ -147,10 +143,10 @@ const App: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-list-check text-indigo-600"></i>
-              <h2 className="text-lg font-semibold text-slate-800">Recent Transactions</h2>
+              <h2 className="text-lg font-bold text-slate-800">Manual Entry Log</h2>
             </div>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-200 text-slate-600">
-              {receipts.length} Records
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-200 text-slate-600 uppercase">
+              {receipts.length} Total Records
             </span>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
