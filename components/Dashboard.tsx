@@ -23,7 +23,6 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
       .forEach(r => {
         dailyData[r.date] = (dailyData[r.date] || 0) + r.totalAmount;
       });
-    // Return last 7 active days
     return Object.entries(dailyData)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .slice(-7);
@@ -64,7 +63,6 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Statistics Bar Graph */}
         <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col">
           <div className="flex justify-between items-start mb-8">
             <div>
@@ -78,7 +76,6 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
           </div>
           
           <div className="flex-1 flex items-end justify-between gap-4 h-48 px-2 relative">
-            {/* Horizontal Grid Lines */}
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
               <div className="border-t border-slate-50 w-full"></div>
               <div className="border-t border-slate-50 w-full"></div>
@@ -90,21 +87,15 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
               const heightPercentage = (revenue / maxRevenue) * 100;
               return (
                 <div key={i} className="flex-1 flex flex-col items-center group relative h-full justify-end">
-                  {/* Tooltip on hover */}
                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
                     ₹{revenue.toLocaleString('en-IN')}
                   </div>
-                  
-                  {/* The Bar */}
                   <div 
                     className="w-full max-w-[40px] bg-indigo-500 rounded-t-lg group-hover:bg-indigo-600 transition-all duration-300 relative"
                     style={{ height: `${Math.max(heightPercentage, 2)}%` }}
                   >
-                    {/* Bar Highlight Effect */}
                     <div className="absolute inset-x-0 top-0 h-1/2 bg-white/10 rounded-t-lg"></div>
                   </div>
-                  
-                  {/* Date Label */}
                   <div className="mt-3 text-[9px] font-black text-slate-400 uppercase transform -rotate-45 sm:rotate-0 origin-center whitespace-nowrap">
                     {new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                   </div>
@@ -130,7 +121,12 @@ const Dashboard: React.FC<DashboardProps> = ({ summary, receipts }) => {
                   const percent = (count / totalCount) * 100;
                   let offset = 0;
                   for(let i=0; i<idx; i++) offset += ((statusCounts[statuses[i]] || 0) / totalCount) * 100;
-                  const colors: any = { [ReceiptStatus.PAID]: '#10b981', [ReceiptStatus.PENDING]: '#f59e0b', [ReceiptStatus.CANCELLED]: '#f43f5e', [ReceiptStatus.PARTIAL]: '#3b82f6' };
+                  const colors: any = { 
+                    [ReceiptStatus.PAID]: '#10b981', 
+                    [ReceiptStatus.PENDING]: '#f59e0b', 
+                    [ReceiptStatus.CANCELLED]: '#f43f5e', 
+                    [ReceiptStatus.WORK_IN_PROGRESS]: '#3b82f6' 
+                  };
                   return <circle key={status} cx="18" cy="18" r="15.9" fill="none" stroke={colors[status]} strokeWidth="3" strokeDasharray={`${percent} ${100 - percent}`} strokeDashoffset={-offset} strokeLinecap="round" />;
                })}
              </svg>

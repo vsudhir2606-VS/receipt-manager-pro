@@ -18,8 +18,8 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
     itemDescription: '',
     customerRequest: '',
     quantity: 1,
-    price: 0,
-    discount: 0,
+    price: '' as string | number, // Blank by default
+    discount: '' as string | number, // Blank by default
     status: ReceiptStatus.PENDING
   });
 
@@ -37,27 +37,43 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
         status: initialData.status
       });
     } else {
-      // Suggest the next number but allow manual overwrite
-      setFormData(prev => ({ ...prev, receiptNo: nextReceiptNo }));
+      setFormData(prev => ({ 
+        ...prev, 
+        receiptNo: nextReceiptNo,
+        price: '',
+        discount: ''
+      }));
     }
   }, [initialData, nextReceiptNo]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (initialData) {
-      onSubmit({ ...initialData, ...formData });
-    } else {
-      onSubmit(formData);
-    }
+  // Safe numerical conversion for calculations
+  const getNumValue = (val: string | number) => {
+    if (val === '') return 0;
+    return typeof val === 'string' ? parseFloat(val) || 0 : val;
   };
 
-  const amount = formData.quantity * formData.price;
-  const totalAmount = amount - formData.discount;
+  const numPrice = getNumValue(formData.price);
+  const numDiscount = getNumValue(formData.discount);
+  const amount = formData.quantity * numPrice;
+  const totalAmount = amount - numDiscount;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const submissionData = {
+      ...formData,
+      price: numPrice,
+      discount: numDiscount
+    };
+    if (initialData) {
+      onSubmit({ ...initialData, ...submissionData });
+    } else {
+      onSubmit(submissionData);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
-        {/* Modal Header */}
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-900">
@@ -75,10 +91,8 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
           </button>
         </div>
 
-        {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Row 1 */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Date</label>
               <input
@@ -101,7 +115,6 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 2 */}
             <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Customer Name</label>
               <input
@@ -114,7 +127,6 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 3 - Full Width */}
             <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Item Description</label>
               <textarea
@@ -127,7 +139,6 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 4 - Full Width */}
             <div className="md:col-span-2 space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Customer Request (Optional)</label>
               <input
@@ -139,7 +150,6 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
               />
             </div>
 
-            {/* Row 5 - Calculations */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Quantity</label>
               <input
@@ -159,9 +169,11 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
                   required
                   min="0"
                   type="number"
+                  step="any"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   className="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+                  placeholder="Manual Price"
                 />
               </div>
             </div>
@@ -173,9 +185,11 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
                 <input
                   min="0"
                   type="number"
+                  step="any"
                   value={formData.discount}
-                  onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
+                  onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
                   className="w-full pl-8 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 outline-none transition-all"
+                  placeholder="Manual Discount"
                 />
               </div>
             </div>
@@ -194,7 +208,6 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
             </div>
           </div>
 
-          {/* Calculations Review Section */}
           <div className="mt-8 p-5 bg-indigo-50 rounded-xl border border-indigo-100 flex flex-col gap-3">
              <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600 font-medium">Subtotal (Qty x Price)</span>
@@ -202,7 +215,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
              </div>
              <div className="flex justify-between items-center text-sm">
                 <span className="text-slate-600 font-medium">Applied Discount</span>
-                <span className="font-bold text-rose-500">-₹{formData.discount.toLocaleString('en-IN')}</span>
+                <span className="font-bold text-rose-500">-₹{numDiscount.toLocaleString('en-IN')}</span>
              </div>
              <div className="h-px bg-indigo-200 my-1"></div>
              <div className="flex justify-between items-center">
@@ -211,7 +224,6 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({ isOpen, onClose, onSubmit, in
              </div>
           </div>
 
-          {/* Form Footer Actions */}
           <div className="flex gap-3 pt-2 sticky bottom-0 bg-white">
             <button
               type="button"

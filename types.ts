@@ -1,9 +1,9 @@
 
 export enum ReceiptStatus {
-  PAID = 'Paid',
+  WORK_IN_PROGRESS = 'Work in Progress',
   PENDING = 'Pending',
-  CANCELLED = 'Cancelled',
-  PARTIAL = 'Partially Paid'
+  PAID = 'Paid',
+  CANCELLED = 'Cancelled'
 }
 
 export interface Receipt {

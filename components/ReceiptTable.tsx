@@ -28,7 +28,7 @@ const ReceiptTable: React.FC<ReceiptTableProps> = ({ receipts, onEdit, onDelete 
       case ReceiptStatus.PAID: return 'bg-emerald-50 text-emerald-700 border-emerald-100';
       case ReceiptStatus.PENDING: return 'bg-amber-50 text-amber-700 border-amber-100';
       case ReceiptStatus.CANCELLED: return 'bg-rose-50 text-rose-700 border-rose-100';
-      case ReceiptStatus.PARTIAL: return 'bg-blue-50 text-blue-700 border-blue-100';
+      case ReceiptStatus.WORK_IN_PROGRESS: return 'bg-blue-50 text-blue-700 border-blue-100';
       default: return 'bg-slate-50 text-slate-700 border-slate-100';
     }
   };
@@ -47,7 +47,7 @@ const ReceiptTable: React.FC<ReceiptTableProps> = ({ receipts, onEdit, onDelete 
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Price</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Amount</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right text-rose-400">Discount</th>
-            <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-center">AMT/PRD Status</th>
+            <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-center">Status</th>
             <th className="px-5 py-6 font-black text-slate-900 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-right">Total Amount</th>
             <th className="px-5 py-6 font-black text-slate-400 uppercase text-[10px] tracking-[0.2em] whitespace-nowrap text-center">Actions</th>
           </tr>
