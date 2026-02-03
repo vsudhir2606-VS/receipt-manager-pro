@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Receipt, ReceiptStatus, FinancialSummary } from './types';
-import Dashboard from './components/Dashboard';
-import ReceiptTable from './components/ReceiptTable';
-import ReceiptForm from './components/ReceiptForm';
+import { Receipt, ReceiptStatus, FinancialSummary } from './types.ts';
+import Dashboard from './components/Dashboard.tsx';
+import ReceiptTable from './components/ReceiptTable.tsx';
+import ReceiptForm from './components/ReceiptForm.tsx';
 
 const App: React.FC = () => {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
